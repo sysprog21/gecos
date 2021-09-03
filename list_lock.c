@@ -24,23 +24,6 @@
 #include "lock.h"
 #include "test.h"
 
-#define DEBUG 1
-
-#if 0
-void show() {
-	node_t *cur;
-	
-	for (cur = *head; cur != NULL; cur=cur->next)
-	{
-		printf("{%d} ", cur->key);
-		if(cur->next) assert(cur->next->key > cur->key);
-	}
-	printf("\n");
-}
-#else
-void show() {}
-#endif
-
 #ifndef SEQLOCK_VLD
 #define validate_cur(a, l) /**/
 #else
@@ -78,10 +61,10 @@ __thread node_t *free_later;
 void free_node_later(int thread, node_t *n)
 {
     if (free_later) {
-        free_node(
-            free_later);  // this should be done by the wunlock in the case of
-                          // the delete func, but for now we are functionnal
-        // write_barrier();
+        /* This should be done by the wunlock in the case of the delete func,
+         * but for now we are functionnal.
+         */
+        free_node(free_later);
     }
     free_later = n;
 }

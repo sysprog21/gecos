@@ -79,37 +79,15 @@ extern __thread unsigned int thd_seed;
 extern __thread unsigned int thd_nbupdaters;
 extern unsigned long nbnodes, nbbuckets, nbkeys;
 extern unsigned long nbthreads, nbreaders, nbupdaters;
-// extern struct list hash[];
 node_t *new_node();
 static void *run(void *);
 static void read_compute();
-
 
 int insert(int key, node_t **head, lock_t *lock);
 int search(int key, node_t **head, lock_t *lock);
 int delete (int key, node_t **head, lock_t *lock);
 
-//#define DEBUG
-//#define CHECK_CCRT
-
-#if 0
-#define COMPUTE_AMOUNT 8
-static void read_compute()
-{
-	volatile int x=COMPUTE_AMOUNT;
-	while(x)
-	{
-		x--;	
-		compiler_barrier();
-	}
-}
-static void write_compute()
-{
-	read_compute();
-}
-#else
 static void read_compute() {}
 static void write_compute() {}
-#endif
 
 #endif

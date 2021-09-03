@@ -36,14 +36,12 @@ void free_node(node_t *n);
 #if (defined(PREALLOCAT))
 void prealloc()
 {
-    int i;
-    for (i = 0; i < NBPRE; i++)
+    for (int i = 0; i < NBPRE; i++)
         free_node((node_t *) calloc(sizeof(node_t), 1));
 }
 #else
 void prealloc() {}
 #endif
-
 
 void init_allocator()
 {
@@ -86,8 +84,6 @@ void delete_allocator()
 }
 
 #ifndef SIMPLE_ALLOC
-
-#if 1
 node_t *get_free()
 {
     if (!lfl) {
@@ -102,23 +98,6 @@ node_t *get_free()
     lfl = node->mr_next;
     return node;
 }
-#else
-node_t *get_free()
-{
-    if (!freelist)
-        return NULL;
-
-    node_t *node = freelist;
-    while (node &&
-           (!__sync_bool_compare_and_swap(&freelist, node, node->next))) {
-        compiler_barrier();
-        node = freelist;
-        compiler_barrier();
-    }
-
-    return node;
-}
-#endif
 
 #define AMORT_FREE_ON 100
 #ifdef SIMPLE_AMORT_FREE
@@ -140,22 +119,9 @@ void add_free(node_t *p)
             lfl = NULL;
             lcnt = 0;
         }
-#if 0
-        while (ACCESS_ONCE(freelist) == NULL) {
-            if ((__sync_val_compare_and_swap(&freelist, NULL, lfl) ==
-                 NULL))  // sucess
-            {
-                lfl = NULL;
-                lcnt = 0;
-                break;
-            }
-        }
-#endif
     }
 }
 #else
-
-#if 1
 void add_free(node_t *p)
 {
     if (!lfl_tail) {
@@ -186,24 +152,9 @@ void add_free(node_t *p)
         lcnt = 0;
     }
 }
-#else
-void add_free(node_t *p)
-{
-    p->mr_next = freelist;
-    while (!__sync_bool_compare_and_swap(&freelist, p->mr_next,
-                                         p))  // only one freer
-    {
-        p->mr_next = freelist;
-    }
-}
-
 #endif
-#endif  // SIMPLE...
-
-
 
 #else
-
 node_t *get_free()
 {
     node_t *node = lfl;
@@ -221,13 +172,8 @@ void add_free(node_t *p)
 
 node_t *new_node()
 {
-    node_t *node;
-
-    // printf("%s %d, ", __FUNCTION__, thread);
-    node = get_free();
-    if (node) {
-        ;
-    } else {
+    node_t *node = get_free();
+    if (!node) {
         node = (node_t *) calloc(sizeof(node_t), 1);
         nbmallocs++;
         // node->gc = 0; calloc do the job
@@ -239,7 +185,6 @@ node_t *new_node()
 
 void free_node(node_t *n)
 {
-    // printf("%s %d, ", __FUNCTION__, thread);
     add_free(n);
     nbfl++;
 }

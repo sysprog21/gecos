@@ -1,8 +1,7 @@
 /*
- * Atomic operations for x86 CPUs.  Many operations will not work
- * on 80386.  Pentium is the only guarantee.
+ * Atomic operations for x86 CPUs.
  *
- * Parts copied from:
+ * Partially copied from:
  *   T. E. Hart. "Making Lockless Synchronization Fast: Performance Implications
  * of Memory Reclamation".
  *
@@ -25,14 +24,10 @@
 
 #ifndef _ATOMIC_H
 #define _ATOMIC_H
-#define _ATOMIC_H_X86
 
-#if ((defined __x86_64__) || (defined __i686__))
+#if defined(__x86_64__) || defined(__i686__)
 #define __TSO__
 #endif
-
-
-#define GCC_OP
 
 /*
  * Wrapper for atomic_cmpxchg_ptr that provides more suitable semantics for
@@ -116,7 +111,6 @@ static inline unsigned long atomic_xchg4(volatile atomic_t *ptr,
  * the compiler not refetch variable, thereby enforcing
  * a snapshot operation.
  */
-
 static inline void compiler_barrier(void)
 {
     asm volatile("" : : : "memory");
@@ -124,7 +118,7 @@ static inline void compiler_barrier(void)
 
 static inline void read_read_barrier(void)
 {
-#if (defined(__TSO__))
+#if defined(__TSO__)
     compiler_barrier();
 #else
 #error "you to define a read barrier"
@@ -134,7 +128,7 @@ static inline void read_read_barrier(void)
 /** full memory barrier **/
 static inline void memory_barrier(void)
 {
-#if (defined(__TSO__))
+#if defined(__TSO__)
     // asm volatile("mfence" : : : "memory");
     __sync_synchronize();
 #else
@@ -148,7 +142,7 @@ static inline void memory_barrier(void)
  */
 static inline void write_read_barrier(void)
 {
-#if (defined(__TSO__))
+#if defined(__TSO__)
     asm volatile("sfence" : : : "memory");
 #else
 #error "you to define a read barrier"
@@ -160,16 +154,14 @@ static inline void write_read_barrier(void)
  * writes across this function.  The x86 does this by default,
  * so only need to rein in the compiler.
  */
-
 static inline void write_write_barrier(void)
 {
-#if (defined(__TSO__))
+#if defined(__TSO__)
     compiler_barrier();
 #else
 #error "you to define a oredered write bariier"
 #endif
 }
-
 
 /*
  * Prevent both the compiler and the CPU from moving anything
@@ -191,4 +183,4 @@ static inline void spin_unlock_barrier(void)
     compiler_barrier();
 }
 
-#endif /* #ifndef _ATOMIC_H */
+#endif

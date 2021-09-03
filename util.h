@@ -77,7 +77,6 @@ static inline void mysrand(unsigned seed)
     thd_seed = seed;
 }
 
-
 static inline double get_sum(double *data, int samples)
 {
     int i;
@@ -171,10 +170,8 @@ static inline void bt_sighandler(int sig, struct sigcontext ctx)
     /* overwrite sigaction with caller's address */
     trace[1] = (void *) inst;
     messages = backtrace_symbols(trace, trace_size);
-    if (messages == NULL) {
+    if (messages == NULL)
         exit(-1);
-    }
-
 
     printf("[%ld] Execution path:\n", thread);
     /* skip first stack frame (points here) */
@@ -183,5 +180,4 @@ static inline void bt_sighandler(int sig, struct sigcontext ctx)
 
     exit(-1);
 }
-
 #endif

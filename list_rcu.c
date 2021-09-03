@@ -23,43 +23,6 @@
 #include "lock.h"
 #include "test.h"
 
-
-#if 0
-#ifdef DEBUG
-void show(node_t** head) {
-	node_t *cur;
-	
-	for (cur = *head; cur != NULL; cur=cur->next)
-	{
-		printf("{%d} ", cur->key);
-		if(cur->next) assert(cur->next->key > cur->key);
-	}
-	printf("\n");
-}
-
-int tab[40];
-void printtab()
-{
-	int i=0;
-	for(;i<40; i++)
-		printf("%d,",tab[i]);
-	printf("\n");
-}
-void cleartab()
-{
-	int i=0;
-	for(;i<40; i++)
-		tab[i]=-1;
-}
-
-#else
-void show() {}
-#endif
-
-#endif
-
-
-
 int search(int key, node_t **head, lock_t *lock)
 {
     node_t *cur;

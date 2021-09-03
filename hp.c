@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Mohamed L. Karaoui.
  * Copyright (c) 2014 Sorbonne Universités, UPMC Univ Paris 06.
  *
- * Parts copied from:
+ * Partially copied from:
  *   T. E. Hart. "Making Lockless Synchronization Fast: Performance Implications
  * of Memory Reclamation".
  *
@@ -26,11 +26,9 @@
 #include <stdlib.h>
 #include "allocator_malloc.h"
 
-
 zombie_list zlist[MAX_THREAD];
 
-/*
- * Comparison function for qsort.
+/* Comparison function for qsort.
  *
  * We just need any total order, so we'll use the arithmetic order
  * of pointers on the machine.
@@ -49,9 +47,7 @@ void scan(int thread)
 {
     /* Iteratation variables. */
     node_t *cur;
-    int i;
 
-    // printf("R: %d, number of blocked node %d\n", R, zlist[thread].number);
     nbblockeds = R;
 
     /* List of SMR callbacks. */
@@ -79,7 +75,7 @@ void scan(int thread)
 
     /* Stage 1: Scan HP list and insert non-null values in plist. */
     psize = 0;
-    for (i = 0; i < H; i++) {
+    for (int i = 0; i < H; i++) {
         if (HP[i].p != NULL)
             plist[psize++] = HP[i].p;
     }

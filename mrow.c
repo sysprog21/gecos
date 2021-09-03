@@ -46,8 +46,6 @@ double run_max_wr[ITERATION];
 double run_min_rd[ITERATION];
 double run_min_wr[ITERATION];
 
-// cpu time
-// double cpu_time[MAX_CPU];
 double thd_time[MAX_THREAD];
 double run_cput[MAX_THREAD];
 
@@ -80,10 +78,6 @@ unsigned long nbthreads, nbupdaters,
     nbreaders __attribute__((__aligned__(CACHESIZE)));
 unsigned long pbnodes, nbbuckets, nbkeys;
 
-/************************************************************************************/
-/************************** Per-thread variables globales
- * **************************************/
-/************************************************************************************/
 __thread long thread;
 __thread long nbretry = 0;
 __thread long nbrelink = 0;
@@ -119,7 +113,6 @@ static inline void get_buckets(int key, node_t ***hd, lock_t **lck)
     *lck = &hash.locks[i];
 }
 
-
 void *run(void *arg)
 {
     unsigned long i;
@@ -133,7 +126,6 @@ void *run(void *arg)
 
     set_affinity(t);
 
-    /************ init *****************/
     thd_ins = 0;
     thd_del = 0;
     thd_sea = 0;
@@ -149,7 +141,6 @@ void *run(void *arg)
     if (!iamreader)
         prealloc();
     mysrand(t ^ time(NULL));
-    /************** init done **************/
 
     /************** barrier ****************/
     atomic_xadd4(&ready, 1);
@@ -208,11 +199,9 @@ void *run(void *arg)
     end = d_gettimeofday();
     /******************* END ****************/
 
-
     // number of ops done
     thd_ops[t] = i;
 
-    // printf("nbmallocs %g\n", nbmallocs);
     thd_mallocs[t] = nbmallocs;
     thd_retry[t] = nbretry;
     thd_relink[t] = nbrelink;
@@ -267,7 +256,6 @@ void hash_init()
         get_buckets(i, &hd, &lck);
         insert(i, hd, lck);
     }
-    // printf("empty = %d, total = %d\n", empty, nbkeys);
 #endif
 
 #ifdef SET_TAIL
@@ -325,17 +313,10 @@ int test(int iteration)
     ready = 0;
     memory_barrier();
 
-
-    // printf("loop %d is started\n", iteration);
-    // printf("thread !!%d\n",thread);
-
     for (i = 0; i < nbthreads; i++) {
         set_affinity(i);
-        // printf("thread = %d ...", i);
-        if (pthread_create(&thread[i], &attr, run, (void *) i)) {
+        if (pthread_create(&thread[i], &attr, run, (void *) i))
             perror("creat");
-        }
-        // printf("thread = %d created\n", i);
     }
 
     while (ready != nbthreads)

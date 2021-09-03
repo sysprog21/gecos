@@ -49,8 +49,8 @@ try_again:
 
 void free_node_later(int thread, node_t *n)
 {
-    lfrc_refcnt_inc(
-        n->next);  // FIXME: is it safe do it here (it was before the delete)
+    /* FIXME: is it safe do it here (it was before the delete) */
+    lfrc_refcnt_inc(n->next);
     lfrc_refcnt_dec(n);
 }
 

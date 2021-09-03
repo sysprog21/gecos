@@ -51,7 +51,6 @@ typedef struct zombie_list_s {
 } __attribute__((__aligned__(CACHESIZE))) zombie_list;
 
 /* Must be dynamically initialized to be an array of size H. */
-// hazard_pointer HP;
 extern hazard_pointer HP[H];
 
 void scan(int);
